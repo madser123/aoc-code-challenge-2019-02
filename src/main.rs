@@ -1,18 +1,18 @@
 #![allow(clippy::missing_errors_doc, clippy::missing_panics_doc)]
 
-use std::{fmt::Display, num::ParseIntError, path::Path, str::FromStr};
+use std::{error, fmt, io, num::ParseIntError, path::Path, str::FromStr};
 
 /// An error from the Intcode computer
 #[derive(Debug)]
 pub enum Error {
     IntParsing(ParseIntError),
     InvalidInstruction(usize),
-    Reading(std::io::Error),
+    Reading(io::Error),
 }
-impl std::error::Error for Error {}
-impl Display for Error {
+impl error::Error for Error {}
+impl fmt::Display for Error {
     /// Displays the error
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let error = match self {
             Self::IntParsing(error) => format!("Failed to parse integer from input! {error}"),
             Self::InvalidInstruction(code) => format!("Invalid instruction op-code '{code}'"),
@@ -57,9 +57,9 @@ impl TryFrom<&[usize]> for Instruction {
 pub struct IntCode {
     memory: Vec<usize>,
 }
-impl Display for IntCode {
+impl fmt::Display for IntCode {
     /// Prints the code in a human-readable way
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let code = self
             .memory
             .chunks(4)
@@ -171,9 +171,8 @@ pub fn solution_two() -> usize {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
     use super::IntCode;
+    use std::str::FromStr;
 
     #[test]
     fn example() {
